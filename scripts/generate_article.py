@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Gera um artigo sobre forró usando a Claude API e salva como post Jekyll."""
+"""Gera um artigo sobre forró usando a Gemini API e salva como post Jekyll."""
 
-import anthropic
+import google.generativeai as genai
 import json
 import os
 import re
@@ -11,7 +11,7 @@ from pathlib import Path
 
 POSTS_DIR = Path("_posts")
 TOPICS_FILE = Path("scripts/topics.json")
-MODEL = "claude-sonnet-4-6"
+MODEL = "gemini-1.5-flash"
 
 SYSTEM_PROMPT = """Você é um especialista em forró e cultura nordestina brasileira, com décadas de pesquisa e paixão pelo tema.
 
@@ -62,23 +62,18 @@ def get_used_slugs() -> set:
 
 
 def generate_article(topic: dict) -> str:
-    client = anthropic.Anthropic()
-    message = client.messages.create(
-        model=MODEL,
-        max_tokens=2000,
-        system=SYSTEM_PROMPT,
-        messages=[
-            {
-                "role": "user",
-                "content": (
-                    f"Escreva um artigo completo sobre: **{topic['title']}**\n\n"
-                    f"Tópicos a abordar: {topic['description']}\n\n"
-                    f"Lembre-se: não inclua o título H1 no corpo, comece direto com a introdução."
-                )
-            }
-        ]
+    genai.configure(api_key=os.environ["GEMINI_API_KEY"])
+    model = genai.GenerativeModel(
+        model_name=MODEL,
+        system_instruction=SYSTEM_PROMPT
     )
-    return message.content[0].text
+    prompt = (
+        f"Escreva um artigo completo sobre: **{topic['title']}**\n\n"
+        f"Tópicos a abordar: {topic['description']}\n\n"
+        f"Lembre-se: não inclua o título H1 no corpo, comece direto com a introdução."
+    )
+    response = model.generate_content(prompt)
+    return response.text
 
 
 def save_article(topic: dict, content: str) -> Path:
