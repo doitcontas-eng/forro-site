@@ -86,8 +86,13 @@ def generate_article(topic: dict) -> str:
         method="POST"
     )
 
-    with urllib.request.urlopen(req) as resp:
-        data = json.loads(resp.read().decode("utf-8"))
+    try:
+        with urllib.request.urlopen(req) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+    except urllib.error.HTTPError as e:
+        body = e.read().decode("utf-8")
+        print(f"Erro HTTP {e.code}: {body}")
+        raise
 
     return data["candidates"][0]["content"]["parts"][0]["text"]
 
