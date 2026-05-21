@@ -12,7 +12,7 @@ from pathlib import Path
 
 POSTS_DIR = Path("_posts")
 TOPICS_FILE = Path("scripts/topics.json")
-MODEL = "gemini-1.5-flash"
+MODEL = "gemini-2.0-flash-lite"
 API_URL = f"https://generativelanguage.googleapis.com/v1beta/models/{MODEL}:generateContent"
 
 SYSTEM_PROMPT = """Você é um especialista em forró e cultura nordestina brasileira, com décadas de pesquisa e paixão pelo tema.
