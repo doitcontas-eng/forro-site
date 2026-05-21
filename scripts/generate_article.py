@@ -87,7 +87,8 @@ def generate_article(topic: dict) -> str:
         data=payload,
         headers={
             "Content-Type": "application/json",
-            "Authorization": f"Bearer {api_key}"
+            "Authorization": f"Bearer {api_key}",
+            "User-Agent": "forro-bot/1.0"
         },
         method="POST"
     )
