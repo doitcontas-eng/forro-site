@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Gera um artigo sobre forró usando a Gemini API e salva como post Jekyll."""
 
-import google.generativeai as genai
+from google import genai
+from google.genai import types
 import json
 import os
 import re
@@ -11,7 +12,7 @@ from pathlib import Path
 
 POSTS_DIR = Path("_posts")
 TOPICS_FILE = Path("scripts/topics.json")
-MODEL = "gemini-1.5-flash"
+MODEL = "gemini-2.0-flash"
 
 SYSTEM_PROMPT = """Você é um especialista em forró e cultura nordestina brasileira, com décadas de pesquisa e paixão pelo tema.
 
@@ -62,17 +63,17 @@ def get_used_slugs() -> set:
 
 
 def generate_article(topic: dict) -> str:
-    genai.configure(api_key=os.environ["GEMINI_API_KEY"])
-    model = genai.GenerativeModel(
-        model_name=MODEL,
-        system_instruction=SYSTEM_PROMPT
-    )
+    client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
     prompt = (
         f"Escreva um artigo completo sobre: **{topic['title']}**\n\n"
         f"Tópicos a abordar: {topic['description']}\n\n"
         f"Lembre-se: não inclua o título H1 no corpo, comece direto com a introdução."
     )
-    response = model.generate_content(prompt)
+    response = client.models.generate_content(
+        model=MODEL,
+        config=types.GenerateContentConfig(system_instruction=SYSTEM_PROMPT),
+        contents=prompt,
+    )
     return response.text
 
 
