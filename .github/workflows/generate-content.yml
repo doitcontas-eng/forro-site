@@ -25,16 +25,6 @@ jobs:
       - name: Instalar dependências
         run: pip install -r requirements.txt
 
-      - name: Verificar chave
-        env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-        run: |
-          if [ -z "$GEMINI_API_KEY" ]; then
-            echo "ERRO: secret GEMINI_API_KEY está vazio ou não existe"
-            exit 1
-          else
-            echo "Chave encontrada (${#GEMINI_API_KEY} caracteres)"
-          fi
 
       - name: Gerar artigo com Gemini API
         env:
