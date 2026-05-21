@@ -1,0 +1,32 @@
+---
+layout: default
+---
+<article class="post">
+  <header class="post-header">
+    <h1>{{ page.title }}</h1>
+    <p class="post-meta">
+      <time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: "%d/%m/%Y" }}</time>
+      {% if page.categories %}· <span>{{ page.categories }}</span>{% endif %}
+    </p>
+  </header>
+
+  <!-- ADSENSE: Anúncio no início do artigo -->
+  <!-- <div class="ad-inline">
+    <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-XXXXXXXX" data-ad-slot="XXXXXXXX" data-ad-format="auto" data-full-width-responsive="true"></ins>
+    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+  </div> -->
+
+  <div class="post-content">
+    {{ content }}
+  </div>
+
+  <!-- ADSENSE: Anúncio no final do artigo -->
+  <!-- <div class="ad-inline">
+    <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-XXXXXXXX" data-ad-slot="XXXXXXXX" data-ad-format="auto" data-full-width-responsive="true"></ins>
+    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+  </div> -->
+
+  <nav class="post-nav">
+    <a href="{{ '/' | prepend: site.baseurl }}">&larr; Ver todos os artigos</a>
+  </nav>
+</article>

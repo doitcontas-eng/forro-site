@@ -1,0 +1,23 @@
+title: Mundo do Forró
+description: Curiosidades, história e cultura do forró brasileiro para quem ama o ritmo do Nordeste
+baseurl: "/forro-site"
+url: "https://SEU-USUARIO.github.io"
+
+markdown: kramdown
+highlighter: rouge
+
+plugins:
+  - jekyll-feed
+  - jekyll-sitemap
+
+permalink: /:year/:month/:day/:title/
+
+paginate: 10
+paginate_path: "/page:num/"
+
+exclude:
+  - scripts/
+  - requirements.txt
+  - README.md
+  - Gemfile
+  - Gemfile.lock

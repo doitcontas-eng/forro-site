@@ -1,0 +1,36 @@
+---
+layout: default
+---
+<div class="home">
+  <div class="hero">
+    <h1>🎵 Curiosidades sobre Forró</h1>
+    <p>Tudo que você precisa saber sobre o ritmo que balança o Brasil</p>
+  </div>
+
+  <div class="posts-grid">
+    {% for post in paginator.posts %}
+    <article class="post-card">
+      <a href="{{ post.url | prepend: site.baseurl }}">
+        <div class="post-card-body">
+          <span class="post-category">{{ post.categories }}</span>
+          <h2>{{ post.title }}</h2>
+          <p>{{ post.description | default: post.excerpt | strip_html | truncatewords: 25 }}</p>
+          <time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%d/%m/%Y" }}</time>
+        </div>
+      </a>
+    </article>
+    {% endfor %}
+  </div>
+
+  {% if paginator.total_pages > 1 %}
+  <nav class="pagination">
+    {% if paginator.previous_page %}
+      <a href="{{ paginator.previous_page_path | prepend: site.baseurl }}">&larr; Mais recentes</a>
+    {% endif %}
+    <span>Página {{ paginator.page }} de {{ paginator.total_pages }}</span>
+    {% if paginator.next_page %}
+      <a href="{{ paginator.next_page_path | prepend: site.baseurl }}">Mais antigas &rarr;</a>
+    {% endif %}
+  </nav>
+  {% endif %}
+</div>
