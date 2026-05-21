@@ -1,7 +1,7 @@
 title: Mundo do Forró
 description: Curiosidades, história e cultura do forró brasileiro para quem ama o ritmo do Nordeste
-baseurl: "/forro-site"
-url: "https://SEU-USUARIO.github.io"
+baseurl: ""
+url: "https://mundodoforro.com.br"
 
 markdown: kramdown
 highlighter: rouge
