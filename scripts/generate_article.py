@@ -1,18 +1,19 @@
 #!/usr/bin/env python3
-"""Gera um artigo sobre forró usando a Gemini API e salva como post Jekyll."""
+"""Gera um artigo sobre forró via Gemini REST API e salva como post Jekyll."""
 
-from google import genai
-from google.genai import types
 import json
 import os
 import re
 import sys
+import urllib.request
+import urllib.error
 from datetime import datetime
 from pathlib import Path
 
 POSTS_DIR = Path("_posts")
 TOPICS_FILE = Path("scripts/topics.json")
 MODEL = "gemini-1.5-flash"
+API_URL = f"https://generativelanguage.googleapis.com/v1beta/models/{MODEL}:generateContent"
 
 SYSTEM_PROMPT = """Você é um especialista em forró e cultura nordestina brasileira, com décadas de pesquisa e paixão pelo tema.
 
@@ -63,18 +64,32 @@ def get_used_slugs() -> set:
 
 
 def generate_article(topic: dict) -> str:
-    client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
+    api_key = os.environ["ANTHROPIC_API_KEY"]
+    url = f"{API_URL}?key={api_key}"
+
     prompt = (
         f"Escreva um artigo completo sobre: **{topic['title']}**\n\n"
         f"Tópicos a abordar: {topic['description']}\n\n"
         f"Lembre-se: não inclua o título H1 no corpo, comece direto com a introdução."
     )
-    response = client.models.generate_content(
-        model=MODEL,
-        config=types.GenerateContentConfig(system_instruction=SYSTEM_PROMPT),
-        contents=prompt,
+
+    payload = json.dumps({
+        "system_instruction": {"parts": [{"text": SYSTEM_PROMPT}]},
+        "contents": [{"parts": [{"text": prompt}]}],
+        "generationConfig": {"maxOutputTokens": 2000, "temperature": 0.7}
+    }).encode("utf-8")
+
+    req = urllib.request.Request(
+        url,
+        data=payload,
+        headers={"Content-Type": "application/json"},
+        method="POST"
     )
-    return response.text
+
+    with urllib.request.urlopen(req) as resp:
+        data = json.loads(resp.read().decode("utf-8"))
+
+    return data["candidates"][0]["content"]["parts"][0]["text"]
 
 
 def save_article(topic: dict, content: str) -> Path:
@@ -83,7 +98,6 @@ def save_article(topic: dict, content: str) -> Path:
     slug = slugify(topic['title'])
     filepath = POSTS_DIR / f"{date}-{slug}.md"
 
-    # Escape aspas no título para o frontmatter
     safe_title = topic['title'].replace('"', '\\"')
     safe_desc = topic['description'][:160].replace('"', '\\"')
 
