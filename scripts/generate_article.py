@@ -63,6 +63,22 @@ def get_used_slugs() -> set:
     return used
 
 
+def list_available_models(api_key: str) -> list:
+    url = f"https://generativelanguage.googleapis.com/v1beta/models?key={api_key}"
+    req = urllib.request.Request(url)
+    try:
+        with urllib.request.urlopen(req) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+            names = [m["name"] for m in data.get("models", [])]
+            print("Modelos disponíveis:")
+            for n in names:
+                print(f"  {n}")
+            return names
+    except urllib.error.HTTPError as e:
+        print(f"Erro ao listar modelos: {e.read().decode()}")
+        return []
+
+
 def generate_article(topic: dict) -> str:
     api_key = os.environ["ANTHROPIC_API_KEY"]
     url = f"{API_URL}?key={api_key}"
@@ -128,6 +144,9 @@ def main():
     if not available:
         print("Todos os tópicos já foram usados! Adicione mais em scripts/topics.json")
         sys.exit(0)
+
+    api_key = os.environ["ANTHROPIC_API_KEY"]
+    list_available_models(api_key)
 
     topic = available[0]
     print(f"Gerando artigo: {topic['title']}")
