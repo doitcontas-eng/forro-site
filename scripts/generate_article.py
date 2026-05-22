@@ -64,7 +64,7 @@ def get_used_slugs() -> set:
 
 
 def generate_article(topic: dict) -> str:
-    api_key = os.environ["ANTHROPIC_API_KEY"]
+    api_key = os.environ["GROQ_API_KEY"]
 
     prompt = (
         f"Escreva um artigo completo sobre: **{topic['title']}**\n\n"

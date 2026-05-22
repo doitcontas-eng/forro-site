@@ -26,9 +26,9 @@ jobs:
         run: pip install -r requirements.txt
 
 
-      - name: Gerar artigo com Gemini API
+      - name: Gerar artigo com Groq API
         env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
         run: python scripts/generate_article.py
 
       - name: Commit e push do novo artigo
