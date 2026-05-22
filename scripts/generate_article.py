@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
-"""Gera um artigo sobre forró via Gemini REST API e salva como post Jekyll."""
+"""Gera um artigo sobre forró via Groq API e salva como post Jekyll."""
 
 import json
 import os
 import re
 import sys
+import random
 import urllib.request
 import urllib.error
+import urllib.parse
 from datetime import datetime
 from pathlib import Path
 
@@ -63,6 +65,27 @@ def get_used_slugs() -> set:
     return used
 
 
+def get_image_url(topic: dict) -> str:
+    api_key = os.environ.get("PEXELS_API_KEY", "")
+    if not api_key:
+        return ""
+
+    search_terms = topic.get("image_search", "forro nordeste brasil danca")
+    url = f"https://api.pexels.com/v1/search?query={urllib.parse.quote(search_terms)}&per_page=10&orientation=landscape"
+
+    req = urllib.request.Request(url, headers={"Authorization": api_key})
+    try:
+        with urllib.request.urlopen(req) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+            photos = data.get("photos", [])
+            if photos:
+                photo = random.choice(photos[:5])
+                return photo["src"]["large"]
+    except Exception as e:
+        print(f"Aviso: imagem não encontrada: {e}")
+    return ""
+
+
 def generate_article(topic: dict) -> str:
     api_key = os.environ["GROQ_API_KEY"]
 
@@ -112,13 +135,15 @@ def save_article(topic: dict, content: str) -> Path:
 
     safe_title = topic['title'].replace('"', '\\"')
     safe_desc = topic['description'][:160].replace('"', '\\"')
+    image_url = get_image_url(topic)
+    image_line = f'\nimage: "{image_url}"' if image_url else ""
 
     frontmatter = f"""---
 layout: post
 title: "{safe_title}"
 date: {date}
 categories: {topic.get('category', 'forró')}
-description: "{safe_desc}"
+description: "{safe_desc}"{image_line}
 ---
 
 """

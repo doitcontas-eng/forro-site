@@ -160,6 +160,17 @@ nav a:hover { color: var(--amarelo); }
   position: relative;
 }
 
+.post-card-image {
+  height: 200px;
+  background-size: cover;
+  background-position: center;
+}
+
+.post-card:not(:has(.post-card-image))::before,
+.post-card:has(.post-card-image) .post-card-body {
+  border-top: none;
+}
+
 .post-card::before {
   content: '';
   display: block;
@@ -237,6 +248,14 @@ nav a:hover { color: var(--amarelo); }
   color: var(--laranja);
   text-transform: uppercase;
   letter-spacing: 0.5px;
+}
+
+.post-hero-image {
+  height: 400px;
+  background-size: cover;
+  background-position: center;
+  margin-bottom: 40px;
+  border-radius: 14px;
 }
 
 /* Article */

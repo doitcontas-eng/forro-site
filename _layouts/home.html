@@ -12,6 +12,9 @@ layout: default
     {% for post in paginator.posts %}
     <article class="post-card">
       <a href="{{ post.url | prepend: site.baseurl }}">
+        {% if post.image %}
+        <div class="post-card-image" style="background-image: url('{{ post.image }}')"></div>
+        {% endif %}
         <div class="post-card-body">
           <span class="post-category">{{ post.categories | default: "Forró" }}</span>
           <h2>{{ post.title }}</h2>
