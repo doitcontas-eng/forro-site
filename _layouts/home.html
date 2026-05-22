@@ -3,8 +3,9 @@ layout: default
 ---
 <div class="home">
   <div class="hero">
-    <h1>🎵 Curiosidades sobre Forró</h1>
-    <p>Tudo que você precisa saber sobre o ritmo que balança o Brasil</p>
+    <div class="hero-badge">🪗 O maior blog de forró do Brasil</div>
+    <h1>O ritmo que <span>balança o Brasil</span></h1>
+    <p>História, curiosidades e cultura do forró — do pé de serra ao universitário</p>
   </div>
 
   <div class="posts-grid">
@@ -12,10 +13,13 @@ layout: default
     <article class="post-card">
       <a href="{{ post.url | prepend: site.baseurl }}">
         <div class="post-card-body">
-          <span class="post-category">{{ post.categories }}</span>
+          <span class="post-category">{{ post.categories | default: "Forró" }}</span>
           <h2>{{ post.title }}</h2>
-          <p>{{ post.description | default: post.excerpt | strip_html | truncatewords: 25 }}</p>
+          <p>{{ post.description | default: post.excerpt | strip_html | truncatewords: 22 }}</p>
+        </div>
+        <div class="post-card-footer">
           <time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%d/%m/%Y" }}</time>
+          <span class="leia-mais">Ler artigo →</span>
         </div>
       </a>
     </article>
