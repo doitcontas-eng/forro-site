@@ -66,24 +66,8 @@ def get_used_slugs() -> set:
 
 
 def get_image_url(topic: dict) -> str:
-    api_key = os.environ.get("PEXELS_API_KEY", "")
-    if not api_key:
-        return ""
-
-    search_terms = topic.get("image_search", "forro nordeste brasil danca")
-    url = f"https://api.pexels.com/v1/search?query={urllib.parse.quote(search_terms)}&per_page=10&orientation=landscape"
-
-    req = urllib.request.Request(url, headers={"Authorization": api_key})
-    try:
-        with urllib.request.urlopen(req) as resp:
-            data = json.loads(resp.read().decode("utf-8"))
-            photos = data.get("photos", [])
-            if photos:
-                photo = random.choice(photos[:5])
-                return photo["src"]["large"]
-    except Exception as e:
-        print(f"Aviso: imagem não encontrada: {e}")
-    return ""
+    seed = slugify(topic['title'])[:20]
+    return f"https://picsum.photos/seed/{seed}/1200/630"
 
 
 def generate_article(topic: dict) -> str:
