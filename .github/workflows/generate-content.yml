@@ -2,8 +2,8 @@ name: Gerar Artigo Semanal
 
 on:
   schedule:
-    # Segunda, quarta e sexta às 09:00 BRT (12:00 UTC)
-    - cron: '0 12 * * 1,3,5'
+    # Todo dia às 09:00 BRT (12:00 UTC)
+    - cron: '0 12 * * *'
   workflow_dispatch:
     # Permite rodar manualmente pela aba Actions do GitHub
 
