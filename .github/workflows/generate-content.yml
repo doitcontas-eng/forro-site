@@ -41,3 +41,10 @@ jobs:
             git commit -m "Novo artigo: $(date +'%Y-%m-%d')" &&
             git push
           )
+
+      - name: Postar no Facebook
+        if: env.FB_PAGE_ID != '' && env.FB_PAGE_TOKEN != ''
+        env:
+          FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
+          FB_PAGE_TOKEN: ${{ secrets.FB_PAGE_TOKEN }}
+        run: python scripts/post_to_facebook.py
