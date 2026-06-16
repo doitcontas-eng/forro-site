@@ -10,6 +10,7 @@ layout: default
     <p class="post-meta">
       <time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: "%d/%m/%Y" }}</time>
       {% if page.categories %}· <span>{{ page.categories }}</span>{% endif %}
+      {% if page.author %}· <span>por {{ page.author }}</span>{% endif %}
     </p>
   </header>
 

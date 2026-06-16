@@ -17,20 +17,23 @@ TOPICS_FILE = Path("scripts/topics.json")
 MODEL = "llama-3.3-70b-versatile"
 API_URL = "https://api.groq.com/openai/v1/chat/completions"
 
-SYSTEM_PROMPT = """Você é um especialista em forró e cultura nordestina brasileira, com décadas de pesquisa e paixão pelo tema.
+SYSTEM_PROMPT = """Você é Renato Alencar, jornalista musical nascido em Recife e apaixonado por forró desde criança. Passou anos entrevistando artistas, pesquisando acervos e viajando pelo Nordeste para documentar a cultura forrozeira. Escreve para o Mundo do Forró com a autoridade de quem viveu o tema de perto.
 
-Escreva artigos informativos, envolventes e bem pesquisados sobre forró para o site Mundo do Forró.
+Escreva artigos profundos, autorais e bem fundamentados sobre forró para o site Mundo do Forró.
 
-Diretrizes:
+REGRAS OBRIGATÓRIAS:
 - Formato: Markdown puro (sem bloco de código, apenas o conteúdo)
-- Tamanho: 900 a 1200 palavras
-- Estrutura: Use ## para H2 e ### para H3. Inclua pelo menos 4 seções
-- Tom: Apaixonado, acessível, informativo. Como um amigo que sabe muito sobre o tema
-- SEO: Use as palavras-chave principais nas primeiras 100 palavras e nos subtítulos
-- Inclua fatos históricos concretos e curiosidades que surpreendam o leitor
-- Termine com uma seção de FAQ ou conclusão que convide o leitor a explorar mais o site
+- Tamanho: 1500 a 2000 palavras — artigos curtos serão rejeitados
+- Estrutura: Use ## para H2 e ### para H3. Inclua pelo menos 5 seções substantivas
+- Tom: Pessoal e apaixonado, como um especialista que conta histórias reais. Evite generalidades
+- Cite fatos verificáveis: anos, nomes de álbuns, títulos de músicas, cidades, datas de shows históricos
+- Cada seção deve ter pelo menos 3 parágrafos densos com informações específicas
+- Use anedotas e detalhes concretos que só quem conhece o assunto a fundo saberia
+- Termine com uma seção "Para ouvir e explorar" com sugestões concretas de músicas/álbuns (não links)
 - NÃO inclua o título H1 no corpo — ele já está no frontmatter
-- NÃO use linguagem excessivamente formal ou acadêmica"""
+- NÃO escreva FAQs genéricos ("O que é forró? R: É um gênero musical...")
+- NÃO use frases vagas como "é importante ressaltar" ou "como todos sabem"
+- NÃO repita a introdução no final com outras palavras"""
 
 
 def slugify(text: str) -> str:
@@ -74,9 +77,13 @@ def generate_article(topic: dict) -> str:
     api_key = os.environ["GROQ_API_KEY"]
 
     prompt = (
-        f"Escreva um artigo completo sobre: **{topic['title']}**\n\n"
-        f"Tópicos a abordar: {topic['description']}\n\n"
-        f"Lembre-se: não inclua o título H1 no corpo, comece direto com a introdução."
+        f"Escreva um artigo completo e aprofundado sobre: **{topic['title']}**\n\n"
+        f"Ângulos obrigatórios a cobrir: {topic['description']}\n\n"
+        f"Lembre-se:\n"
+        f"- Comece direto com um parágrafo de abertura envolvente, sem título H1\n"
+        f"- Cite nomes reais, datas, álbuns e músicas específicas\n"
+        f"- Mínimo de 1500 palavras\n"
+        f"- Termine com 'Para ouvir e explorar' com sugestões concretas"
     )
 
     payload = json.dumps({
@@ -85,8 +92,8 @@ def generate_article(topic: dict) -> str:
             {"role": "system", "content": SYSTEM_PROMPT},
             {"role": "user", "content": prompt}
         ],
-        "max_tokens": 2000,
-        "temperature": 0.7
+        "max_tokens": 3500,
+        "temperature": 0.8
     }).encode("utf-8")
 
     req = urllib.request.Request(
@@ -126,6 +133,7 @@ def save_article(topic: dict, content: str) -> Path:
 layout: post
 title: "{safe_title}"
 date: {date}
+author: "Renato Alencar"
 categories: {topic.get('category', 'forró')}
 description: "{safe_desc}"{image_line}
 ---
