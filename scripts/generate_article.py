@@ -5,10 +5,8 @@ import json
 import os
 import re
 import sys
-import random
 import urllib.request
 import urllib.error
-import urllib.parse
 from datetime import datetime
 from pathlib import Path
 
@@ -61,10 +59,19 @@ def load_topics() -> list:
 def get_used_slugs() -> set:
     used = set()
     for post in POSTS_DIR.glob('*.md'):
+        # slug pelo nome do arquivo
         parts = post.stem.split('-')
         if len(parts) > 3:
-            slug = '-'.join(parts[3:])
-            used.add(slug)
+            used.add('-'.join(parts[3:]))
+        # slug pelo título no frontmatter (evita duplicatas mesmo com nomes de arquivo diferentes)
+        try:
+            for line in post.read_text(encoding='utf-8').split('\n'):
+                if line.startswith('title:'):
+                    title = line.split(':', 1)[1].strip().strip('"')
+                    used.add(slugify(title))
+                    break
+        except Exception:
+            pass
     return used
 
 
