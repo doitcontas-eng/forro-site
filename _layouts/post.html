@@ -1,16 +1,59 @@
 ---
 layout: default
 ---
-<article class="post">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "{{ page.title | escape }}",
+  "description": "{{ page.description | default: page.excerpt | strip_html | truncatewords: 30 | escape }}",
+  "datePublished": "{{ page.date | date_to_xmlschema }}",
+  "dateModified": "{{ page.date | date_to_xmlschema }}",
+  "url": "{{ page.url | prepend: site.url }}",
+  "inLanguage": "pt-BR",
+  {% if page.image %}"image": {
+    "@type": "ImageObject",
+    "url": "{{ page.image }}",
+    "width": 1200,
+    "height": 630
+  },{% endif %}
+  "author": {
+    "@type": "Person",
+    "name": "Renato Alencar",
+    "url": "{{ '/sobre' | prepend: site.url }}",
+    "jobTitle": "Jornalista Musical",
+    "description": "Jornalista nascido em Recife, especialista em forró e música nordestina. Escreve sobre o tema há mais de uma década.",
+    "sameAs": [
+      "https://mundodoforro.com.br/sobre"
+    ]
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "{{ site.title }}",
+    "url": "{{ site.url }}",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "{{ site.url }}/assets/images/logo.png"
+    }
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "{{ page.url | prepend: site.url }}"
+  }
+}
+</script>
+
+<article class="post" itemscope itemtype="https://schema.org/Article">
   {% if page.image %}
   <div class="post-hero-image" style="background-image: url('{{ page.image }}')"></div>
   {% endif %}
   <header class="post-header">
-    <h1>{{ page.title }}</h1>
+    <h1 itemprop="headline">{{ page.title }}</h1>
     <p class="post-meta">
-      <time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: "%d/%m/%Y" }}</time>
-      {% if page.categories %}· <span>{{ page.categories }}</span>{% endif %}
-      {% if page.author %}· <span>por {{ page.author }}</span>{% endif %}
+      <time datetime="{{ page.date | date_to_xmlschema }}" itemprop="datePublished">{{ page.date | date: "%d/%m/%Y" }}</time>
+      {% if page.categories %}· <span itemprop="keywords">{{ page.categories }}</span>{% endif %}
+      {% if page.author %}· <span itemprop="author" itemscope itemtype="https://schema.org/Person"><span itemprop="name">por {{ page.author }}</span></span>{% endif %}
     </p>
   </header>
 
@@ -29,6 +72,21 @@ layout: default
     <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-XXXXXXXX" data-ad-slot="XXXXXXXX" data-ad-format="auto" data-full-width-responsive="true"></ins>
     <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
   </div> -->
+
+  <section class="related-posts">
+    <h3>Leia também</h3>
+    <ul>
+      {% assign related = site.posts | where_exp: "post", "post.url != page.url" | limit: 4 %}
+      {% for post in related %}
+      <li><a href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a></li>
+      {% endfor %}
+    </ul>
+  </section>
+
+  <div class="author-bio">
+    <h3>Sobre o autor</h3>
+    <p><strong>Renato Alencar</strong> é jornalista cultural formado pela UFPE, especialista em forró e música nordestina. Trabalhou na Rádio Jornal do Commercio e percorreu o Nordeste documentando artistas e tradições do forró há mais de 20 anos. <a href="{{ '/sobre' | prepend: site.baseurl }}">Saiba mais sobre o autor →</a></p>
+  </div>
 
   <nav class="post-nav">
     <a href="{{ '/' | prepend: site.baseurl }}">&larr; Ver todos os artigos</a>

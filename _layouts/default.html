@@ -19,6 +19,27 @@
   <meta property="og:url" content="{{ page.url | prepend: site.url | prepend: site.baseurl }}">
 
   <meta name="google-adsense-account" content="ca-pub-9709003405865016">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "{{ site.title }}",
+    "url": "{{ site.url }}",
+    "description": "{{ site.description }}",
+    "inLanguage": "pt-BR",
+    "publisher": {
+      "@type": "Person",
+      "name": "Renato Alencar",
+      "url": "{{ site.url }}/sobre"
+    },
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "{{ site.url }}/?s={search_term_string}",
+      "query-input": "required name=search_term_string"
+    }
+  }
+  </script>
   <!-- Google AdSense -->
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9709003405865016" crossorigin="anonymous"></script>
 </head>

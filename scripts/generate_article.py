@@ -15,23 +15,28 @@ TOPICS_FILE = Path("scripts/topics.json")
 MODEL = "llama-3.3-70b-versatile"
 API_URL = "https://api.groq.com/openai/v1/chat/completions"
 
-SYSTEM_PROMPT = """Você é Renato Alencar, jornalista musical nascido em Recife e apaixonado por forró desde criança. Passou anos entrevistando artistas, pesquisando acervos e viajando pelo Nordeste para documentar a cultura forrozeira. Escreve para o Mundo do Forró com a autoridade de quem viveu o tema de perto.
+SYSTEM_PROMPT = """Você é Renato Alencar, jornalista musical nascido em Recife em 1978. Formado em Jornalismo pela UFPE, trabalhou na Rádio Jornal do Commercio nos anos 2000, entrevistou artistas como Dominguinhos, Elba Ramalho e Flávio José, e percorreu o interior do Nordeste documentando festas juninas e forró pé de serra. Hoje mantém o Mundo do Forró, o maior blog independente de forró do Brasil.
 
 Escreva artigos profundos, autorais e bem fundamentados sobre forró para o site Mundo do Forró.
 
-REGRAS OBRIGATÓRIAS:
+REGRAS OBRIGATÓRIAS DE CONTEÚDO:
 - Formato: Markdown puro (sem bloco de código, apenas o conteúdo)
-- Tamanho: 1500 a 2000 palavras — artigos curtos serão rejeitados
+- Tamanho: 1800 a 2200 palavras — artigos curtos serão rejeitados
 - Estrutura: Use ## para H2 e ### para H3. Inclua pelo menos 5 seções substantivas
-- Tom: Pessoal e apaixonado, como um especialista que conta histórias reais. Evite generalidades
-- Cite fatos verificáveis: anos, nomes de álbuns, títulos de músicas, cidades, datas de shows históricos
+- Tom: Pessoal e apaixonado. Comece pelo menos 2 seções com uma memória pessoal sua ("Lembro de quando...", "Em 2003, fui a Caruaru e...", "Num arquivo de rádio que pesquisei em Recife...")
+- Cite fatos verificáveis: anos exatos, nomes de álbuns, títulos de músicas, cidades, gravadoras, datas de shows históricos
 - Cada seção deve ter pelo menos 3 parágrafos densos com informações específicas
 - Use anedotas e detalhes concretos que só quem conhece o assunto a fundo saberia
-- Termine com uma seção "Para ouvir e explorar" com sugestões concretas de músicas/álbuns (não links)
+- Em pelo menos 2 pontos do artigo, faça referência a fontes como: "segundo o pesquisador Câmara Cascudo", "como registrou o Museu do Forró em Fortaleza", "de acordo com a Enciclopédia da Música Brasileira", "o sociólogo Hermano Vianna documentou que..."
+- Termine com uma seção "Para ouvir e explorar" com sugestões concretas de músicas/álbuns com ano de lançamento
+
+REGRAS OBRIGATÓRIAS DE FORMATO:
 - NÃO inclua o título H1 no corpo — ele já está no frontmatter
 - NÃO escreva FAQs genéricos ("O que é forró? R: É um gênero musical...")
-- NÃO use frases vagas como "é importante ressaltar" ou "como todos sabem"
-- NÃO repita a introdução no final com outras palavras"""
+- NÃO use frases vagas como "é importante ressaltar", "como todos sabem", "vale destacar que", "não podemos deixar de mencionar"
+- NÃO repita a introdução no final com outras palavras
+- NÃO use listas com bullet points genéricos — prefira parágrafos narrativos
+- SEMPRE termine cada seção com uma observação pessoal sua ou uma anedota de reportagem"""
 
 
 def slugify(text: str) -> str:
@@ -75,7 +80,24 @@ def get_used_slugs() -> set:
     return used
 
 
+WIKIMEDIA_IMAGES = {
+    "luiz gonzaga": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Luiz_Gonzaga_1973.jpg/1200px-Luiz_Gonzaga_1973.jpg",
+    "sanfona": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/Gaita_de_foles_-_geograph.org.uk_-_1008.jpg/1200px-Gaita_de_foles_-_geograph.org.uk_-_1008.jpg",
+    "acordeao": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/Accordion_player.jpg/1200px-Accordion_player.jpg",
+    "zabumba": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/32/Zabumba.jpg/1200px-Zabumba.jpg",
+    "festa junina": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Festa_junina_2.jpg/1200px-Festa_junina_2.jpg",
+    "sao joao": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9d/Festa_de_S%C3%A3o_Jo%C3%A3o_-_Caruaru.jpg/1200px-Festa_de_S%C3%A3o_Jo%C3%A3o_-_Caruaru.jpg",
+    "nordeste": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Caatinga2.jpg/1200px-Caatinga2.jpg",
+    "danca": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e9/Forra_couple.jpg/1200px-Forra_couple.jpg",
+    "triangulo": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Triangle_percussion_instrument.jpg/1200px-Triangle_percussion_instrument.jpg",
+    "baiao": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Luiz_Gonzaga_1973.jpg/1200px-Luiz_Gonzaga_1973.jpg",
+}
+
 def get_image_url(topic: dict) -> str:
+    title_lower = topic['title'].lower()
+    for keyword, url in WIKIMEDIA_IMAGES.items():
+        if keyword in title_lower:
+            return url
     seed = slugify(topic['title'])[:20]
     return f"https://picsum.photos/seed/{seed}/1200/630"
 
@@ -86,11 +108,13 @@ def generate_article(topic: dict) -> str:
     prompt = (
         f"Escreva um artigo completo e aprofundado sobre: **{topic['title']}**\n\n"
         f"Ângulos obrigatórios a cobrir: {topic['description']}\n\n"
-        f"Lembre-se:\n"
-        f"- Comece direto com um parágrafo de abertura envolvente, sem título H1\n"
-        f"- Cite nomes reais, datas, álbuns e músicas específicas\n"
-        f"- Mínimo de 1500 palavras\n"
-        f"- Termine com 'Para ouvir e explorar' com sugestões concretas"
+        f"Instruções:\n"
+        f"- Comece com um parágrafo de abertura forte e pessoal — uma memória sua, uma cena vivida, ou um detalhe surpreendente\n"
+        f"- Cite nomes reais, datas exatas, nomes de álbuns e músicas específicas\n"
+        f"- Mencione pelo menos 2 fontes acadêmicas ou institucionais (pesquisadores, museus, enciclopédias)\n"
+        f"- Inclua pelo menos 2 memórias pessoais suas como jornalista (entrevistas, viagens, pesquisas em arquivos)\n"
+        f"- Mínimo de 1800 palavras\n"
+        f"- Termine com 'Para ouvir e explorar' com álbuns, músicas e ano de lançamento"
     )
 
     payload = json.dumps({
